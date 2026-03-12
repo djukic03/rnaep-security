@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fonify — Prijava</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav>
+  <a href="shop.html" class="nav-logo">Fonify</a>
+  <div class="nav-links">
+    <a href="shop.html">Prodavnica</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-card card">
+    <h1>Prijava</h1>
+    <p class="subtitle">Unesite vaše korisničke podatke</p>
+
+    <div class="form-group">
+      <label for="login-username">Korisničko ime</label>
+      <input type="text" id="login-username" placeholder="admin"/>
+    </div>
+    <div class="form-group">
+      <label for="login-password">Lozinka</label>
+      <input type="password" id="login-password" placeholder="••••••••"/>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-primary" id="btn-login">Prijavi se</button>
+      <div class="form-link">Nemate nalog? <a href="register.html">Registrujte se</a></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>

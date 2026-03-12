@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fonify — Prodavnica</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav>
+  <a href="shop.html" class="nav-logo">Fonify</a>
+  <div class="nav-links">
+    <a href="shop.html" class="active">Prodavnica</a>
+    <a href="orders.html">Moje porudžbine</a>
+  </div>
+  <div class="nav-links">
+    <div id="nav-out" style="display:flex; gap:8px;">
+      <a href="register.html" class="btn btn-sm">Register</a>
+      <a href="login.html" class="btn btn-sm btn-primary">Login</a>
+    </div>
+    <div id="nav-in" style="display:none; align-items:center; gap:10px;" class="user-pill">
+      <span>Zdravo, <strong id="nav-username">—</strong></span>
+      <span id="nav-role-badge" class="badge badge-blue">user</span>
+      <button class="btn btn-sm btn-danger" id="btn-logout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <h1>Proizvodi</h1>
+  <div class="product-list" id="product-list">
+    <div class="loading">Učitavanje...</div>
+  </div>
+
+  <div class="card" style="margin-top: 24px;">
+    <h2>Nova porudžbina</h2>
+
+    <div id="order-auth-warning" style="display:none;">
+      <p class="warning-text">Morate se <a href="login.html">prijaviti</a> da biste kreirali porudžbinu.</p>
+    </div>
+
+    <div id="order-form-fields">
+      <div class="order-form-row">
+        <div class="form-group" style="margin:0;">
+          <label>Proizvod</label>
+          <select id="order-product"></select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Količina</label>
+          <input type="number" id="order-qty" value="1" min="1"/>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Napomena (opciono)</label>
+          <input type="text" id="order-note" placeholder="npr. gift wrap"/>
+        </div>
+        <button class="btn btn-primary" id="btn-order">Naruči</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>

@@ -1,8 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 from fastapi.responses import JSONResponse
 
 app = FastAPI(title="API Gateway")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 AUTH_URL = "http://auth-service:8000"
 PRODUCTS_URL = "http://products-service:8000/products"

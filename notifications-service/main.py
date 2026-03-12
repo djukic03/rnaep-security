@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from typing import List
-from models import Notification
+from schemas import Notification
 
 app = FastAPI(title="Notifications Service")
 
