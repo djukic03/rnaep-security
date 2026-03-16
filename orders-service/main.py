@@ -30,7 +30,6 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
     requests.put(f"{PRODUCTS_URL}/{order.product_id}/reduce", params={"quantity": order.quantity})
 
     new_order = models.OrderModel(
-        id=order.id,
         product_id=order.product_id, 
         quantity=order.quantity, 
         note=order.note
