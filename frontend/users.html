@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
+  <title>Fonify - Korisnici</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav>
+  <a href="shop.html" class="nav-logo">Fonify</a>
+  <div class="nav-links">
+    <a href="shop.html">Prodavnica</a>
+    <a href="orders.html">Moje porudžbine</a>
+    <a href="users.html" class="active">Korisnici</a>
+  </div>
+  <div class="nav-links">
+    <div id="nav-out" style="display:flex; gap:8px;">
+      <a href="register.html" class="btn btn-sm">Register</a>
+      <a href="login.html" class="btn btn-sm btn-primary">Login</a>
+    </div>
+    <div id="nav-in" style="display:none;">
+      <button class="btn btn-sm btn-danger" id="btn-logout">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div id="users-forbidden" class="card locked" style="display:none;">
+    <h2>Pristup zabranjen</h2>
+    <p>Ova stranica je dostupna samo administratorima.</p>
+    <a href="shop.html" class="btn btn-primary">Nazad na prodavnicu</a>
+  </div>
+
+  <div id="users-locked" class="card locked" style="display:none;">
+    <h2>Pristup odbijen</h2>
+    <p>Molimo Vas prijavite se.</p>
+    <a href="login.html" class="btn btn-primary">Prijavi se</a>
+  </div>
+
+  <div id="users-unlocked" style="display:none;">
+    <div class="card">
+      <h2>Svi korisnici</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Korisničko ime</th><th>Uloga</th></tr>
+        </thead>
+        <tbody id="users-tbody">
+          <tr><td colspan="3" class="empty">Učitavanje...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>

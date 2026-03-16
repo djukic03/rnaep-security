@@ -26,12 +26,7 @@ function renderProducts(products) {
 
   list.innerHTML = products
     .map((p) => {
-      const stockBadge =
-        p.quantity > 5
-          ? `<span class="badge badge-green">Na stanju: ${p.quantity}</span>`
-          : p.quantity > 0
-            ? `<span class="badge badge-yellow">Malo na stanju: ${p.quantity}</span>`
-            : `<span class="badge badge-red">Nema na stanju</span>`;
+      const stockBadge = `<span class="badge badge-green">Na stanju: ${p.quantity}</span>`;
 
       return `
       <div class="product-row">
@@ -59,12 +54,40 @@ function populateOrderSelect(products) {
     .join("");
 }
 
+document.getElementById("btn-order")?.addEventListener("click", async () => {
+  const token = sessionStorage.getItem("access_token");
+  const product_id = document.getElementById("order-product").value;
+  const quantity = parseInt(document.getElementById("order-qty").value);
+  const note = document.getElementById("order-note").value.trim();
+
+  const res = await fetch(`${GATEWAY_URL}/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ product_id, quantity, note }),
+  });
+
+  if (res.ok) {
+    alert("Porudžbina uspešno kreirana!");
+  } else {
+    const data = await res.json();
+    alert(data.detail || "Greška pri kreiranju porudžbine.");
+  }
+});
+
 async function loadOrders() {
   const tbody = document.getElementById("orders-tbody");
   if (!tbody) return;
 
   try {
-    const res = await fetch(`${GATEWAY_URL}/orders`);
+    token = sessionStorage.getItem("access_token");
+    const res = await fetch(`${GATEWAY_URL}/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const orders = await res.json();
     renderOrders(orders);
   } catch (err) {
@@ -87,16 +110,69 @@ function renderOrders(orders) {
     .map(
       (o) => `
     <tr>
-      <td>${o.id}</td>
       <td>${o.product_id}</td>
       <td>${o.quantity}</td>
       <td>${o.note || "—"}</td>
-      <td><span class="badge badge-green">Potvrđeno</span></td>
     </tr>
   `,
     )
     .join("");
 }
+
+
+async function loadUsers() {
+  const tbody = document.getElementById("users-tbody");
+  if (!tbody) return;
+
+  try {
+    token = sessionStorage.getItem("access_token");
+    const res = await fetch(`${GATEWAY_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const users = await res.json();
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td>${u.id}</td>
+        <td>${u.username}</td>
+        <td><span class="badge ${u.role === 'admin' ? 'badge-red' : 'badge-blue'}">${u.role}</span></td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    tbody.innerHTML =
+      '<tr><td colspan="3" class="empty">Greška pri učitavanju korisnika.</td></tr>';
+  }
+}
+
+const usersForbidden = document.getElementById("users-forbidden");
+const usersLocked    = document.getElementById('users-locked');
+const usersUnlocked  = document.getElementById('users-unlocked');
+
+if (usersForbidden && usersLocked && usersUnlocked) {
+  const token  = sessionStorage.getItem('access_token');
+  const role   = sessionStorage.getItem('role');
+
+  if (!token) {
+    usersLocked.style.display    = 'block';
+    usersForbidden.style.display = 'none';
+    usersUnlocked.style.display  = 'none';
+  } else if (role !== 'admin') {
+    usersForbidden.style.display = 'block';
+    usersLocked.style.display    = 'none';
+    usersUnlocked.style.display  = 'none';
+  } else {
+    usersUnlocked.style.display  = 'block';
+    usersForbidden.style.display = 'none';
+    usersLocked.style.display    = 'none';
+    loadUsers();
+  }
+}
+
+
+
+
+
 
 function updateNavAuth() {
   const loggedIn = !!sessionStorage.getItem("access_token");

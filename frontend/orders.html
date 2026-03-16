@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fonify — Moje porudžbine</title>
+  <title>Fonify - Moje porudžbine</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -13,14 +13,14 @@
   <div class="nav-links">
     <a href="shop.html">Prodavnica</a>
     <a href="orders.html" class="active">Moje porudžbine</a>
+    <a href="users.html">Korisnici</a>
   </div>
-  <div class="nav-links">
+  <div class="nav-links-btns">
     <div id="nav-out" style="display:flex; gap:8px;">
       <a href="register.html" class="btn btn-sm">Register</a>
       <a href="login.html" class="btn btn-sm btn-primary">Login</a>
     </div>
     <div id="nav-in" style="display:none; align-items:center; gap:10px;" class="user-pill">
-      <span>Zdravo, <strong id="nav-username">—</strong></span>
       <span id="nav-role-badge" class="badge badge-blue">user</span>
       <button class="btn btn-sm btn-danger" id="btn-logout">Logout</button>
     </div>
@@ -30,9 +30,8 @@
 <div class="container">
 
   <div id="orders-locked" class="card locked" style="display:none;">
-    <div class="lock-icon">🔒</div>
     <h2>Pristup odbijen</h2>
-    <p>Ova stranica zahteva validan JWT token.<br>Molimo vas prijavite se.</p>
+    <p>Ova stranica je dostupna samo prijavenim korisnicima.<br>Molimo vas prijavite se.</p>
     <a href="login.html" class="btn btn-primary">Prijavi se</a>
   </div>
 
@@ -41,7 +40,7 @@
       <h2>Moje porudžbine</h2>
       <table>
         <thead>
-          <tr><th>ID</th><th>Product ID</th><th>Količina</th><th>Napomena</th><th>Status</th></tr>
+          <tr><th>Product ID</th><th>Količina</th><th>Napomena</th></tr>
         </thead>
         <tbody id="orders-tbody">
           <tr><td colspan="5" class="empty">Učitavanje...</td></tr>

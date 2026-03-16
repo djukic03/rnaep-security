@@ -4,6 +4,7 @@ from database import Base
 class OrderModel(Base):
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer)
-    quantity = Column(Integer)
+    user_id = Column(Integer, nullable=False)
+    product_id = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
     note = Column(String, nullable=True)
