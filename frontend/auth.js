@@ -28,8 +28,11 @@ document.getElementById("btn-register")?.addEventListener("click", async () => {
   }
 });
 
-document.getElementById("btn-logout")?.addEventListener("click", () => {
-  sessionStorage.removeItem('access_token');
+document.getElementById("btn-logout")?.addEventListener("click", async () => {
+  await fetch(`${GATEWAY_URL}/logout`, { 
+    method: 'POST',
+    credentials: 'include'
+  });
   sessionStorage.removeItem('role');
   alert('Uspešno odjavljeni!');
   window.location.href = 'shop.html';
@@ -43,12 +46,12 @@ async function handleCallback() {
   const res = await fetch(`${GATEWAY_URL}/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ auth_code: code })
   });
 
   if (res.ok) {
     const data = await res.json();
-    sessionStorage.setItem('access_token', data.access_token);
     sessionStorage.setItem('role', data.role);
     alert('Uspešna prijava!');
     window.location.href = 'shop.html';

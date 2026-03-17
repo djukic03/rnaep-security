@@ -55,22 +55,22 @@ function populateOrderSelect(products) {
 }
 
 document.getElementById("btn-order")?.addEventListener("click", async () => {
-  const token = sessionStorage.getItem("access_token");
   const product_id = document.getElementById("order-product").value;
   const quantity = parseInt(document.getElementById("order-qty").value);
   const note = document.getElementById("order-note").value.trim();
 
   const res = await fetch(`${GATEWAY_URL}/orders`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+    headers: {"Content-Type": "application/json"},
+    credentials: "include",
     body: JSON.stringify({ product_id, quantity, note }),
   });
 
   if (res.ok) {
     alert("Porudžbina uspešno kreirana!");
+    document.getElementById("order-product").selectedIndex = 0;
+    document.getElementById("order-qty").value = "1";
+    document.getElementById("order-note").value = "";
   } else {
     const data = await res.json();
     alert(data.detail || "Greška pri kreiranju porudžbine.");
@@ -82,11 +82,8 @@ async function loadOrders() {
   if (!tbody) return;
 
   try {
-    token = sessionStorage.getItem("access_token");
     const res = await fetch(`${GATEWAY_URL}/orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include"
     });
     const orders = await res.json();
     renderOrders(orders);
@@ -125,11 +122,8 @@ async function loadUsers() {
   if (!tbody) return;
 
   try {
-    token = sessionStorage.getItem("access_token");
     const res = await fetch(`${GATEWAY_URL}/users`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include"
     });
     const users = await res.json();
     tbody.innerHTML = users.map(u => `
@@ -150,10 +144,9 @@ const usersLocked    = document.getElementById('users-locked');
 const usersUnlocked  = document.getElementById('users-unlocked');
 
 if (usersForbidden && usersLocked && usersUnlocked) {
-  const token  = sessionStorage.getItem('access_token');
   const role   = sessionStorage.getItem('role');
 
-  if (!token) {
+  if (!role) {
     usersLocked.style.display    = 'block';
     usersForbidden.style.display = 'none';
     usersUnlocked.style.display  = 'none';
@@ -175,7 +168,7 @@ if (usersForbidden && usersLocked && usersUnlocked) {
 
 
 function updateNavAuth() {
-  const loggedIn = !!sessionStorage.getItem("access_token");
+  const loggedIn = !!sessionStorage.getItem("role");
   const navOut = document.getElementById("nav-out");
   const navIn = document.getElementById("nav-in");
   if (!navOut || !navIn) return;
@@ -188,8 +181,8 @@ const ordersLocked = document.getElementById("orders-locked");
 const ordersUnlocked = document.getElementById("orders-unlocked");
 
 if (ordersLocked && ordersUnlocked) {
-  const token = sessionStorage.getItem("access_token");
-  if (!token) {
+  const role = sessionStorage.getItem("role");
+  if (!role) {
     ordersLocked.style.display = "block";
     ordersUnlocked.style.display = "none";
   } else {
@@ -203,7 +196,7 @@ const orderAuthWarning = document.getElementById("order-auth-warning");
 const orderFormFields = document.getElementById("order-form-fields");
 
 if (orderAuthWarning && orderFormFields) {
-  const loggedIn = !!sessionStorage.getItem("access_token");
+  const loggedIn = !!sessionStorage.getItem("role");
   orderAuthWarning.style.display = loggedIn ? "none" : "block";
   orderFormFields.style.display = loggedIn ? "block" : "none";
 }

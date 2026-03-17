@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Header, Depends, HTTPException, Form
+from fastapi import FastAPI, Request, Header, Depends, HTTPException, Cookie, Response
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
@@ -8,7 +8,7 @@ app = FastAPI(title="API Gateway")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,14 +22,12 @@ PRODUCTS_URL = "http://products-service:8000/products"
 ORDERS_URL = "http://orders-service:8000/orders"
 NOTIFICATIONS_URL = "http://notifications-service:8000/notifications"
 
-def verify_token(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
+def verify_token(access_token: str = Cookie(None)):
+    if not access_token:
         raise HTTPException(status_code=401, detail="Token nije prosleđen")
     
-    token = authorization.split(" ")[1]
-    
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token je istekao")
@@ -68,11 +66,26 @@ async def authorize(request: Request):
     return HTMLResponse(content=response.text)
 
 @app.post("/token")
-def token(body: dict):
-    response = requests.post(AUTH_URL + "/token", json=body)
-    return JSONResponse(content=response.json(), status_code=response.status_code)    
+def token(body: dict, response: Response):
+    res = requests.post(AUTH_URL + "/token", json=body)
+    if res.status_code != 200:
+        return JSONResponse(content=res.json(), status_code=res.status_code)
+    data = res.json()
+    response.set_cookie(
+        key="access_token",
+        value=data["access_token"],
+        httponly=True,
+        samesite="strict"
+    )
+    return {"role": data["role"]}
     
-    
+@app.post("/logout")
+def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Uspešna odjava"}
+
+
+
 
 @app.get("/products")
 def get_products():

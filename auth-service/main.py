@@ -15,6 +15,11 @@ app = FastAPI(title="Auth Service")
 templates = Jinja2Templates(directory="templates")
 auth_codes = {}
 
+
+#############################
+#       ACG flow
+############################
+
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
@@ -90,7 +95,36 @@ def token(code: schemas.TokenRequest, db: Session = Depends(get_db)):
     }
     
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    
     return {
-        "access_token": token, 
+        "access_token": token,
         "role": user.role
+    }
+    
+###############################
+#      CCG flow
+###############################
+
+SERVICE_CLIENTS = {
+    "orders-service": "orders-secret"
+}
+
+@app.post("/token/service")
+def service_token(credentials: schemas.ServiceTokenRequest):
+    client_secret = SERVICE_CLIENTS.get(credentials.client_id)
+    
+    if not client_secret or client_secret != credentials.client_secret:
+        raise HTTPException(status_code=401, detail="Neispravni kredencijali")
+    
+    payload = {
+        "sub": credentials.client_id,
+        "iss": "auth-service",
+        "iat": datetime.now(),
+        "exp": datetime.now() + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
+    }
+    
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return {
+        "access_token": token
     }

@@ -12,3 +12,7 @@ class UserCreate(BaseModel):
     
 class TokenRequest(BaseModel):
     auth_code: str
+    
+class ServiceTokenRequest(BaseModel):
+    client_id: str
+    client_secret: str

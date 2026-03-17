@@ -10,8 +10,22 @@ app = FastAPI(title="Orders Service")
 
 PRODUCTS_URL = "http://products-service:8000/products"
 NOTIFICATIONS_URL = "http://notifications-service:8000/notifications"
+AUTH_URL = "http://auth-service:8000"
+CLIENT_ID = "orders-service"
+CLIENT_SECRET = "orders-secret"
 
 models.Base.metadata.create_all(bind=engine)
+
+
+def get_service_token():
+    response = requests.post(f"{AUTH_URL}/token/service", json={
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    })
+    if response.status_code == 200:
+        return response.json().get("access_token")
+    return None
+
 
 @app.get("/orders", response_model=List[schemas.Order])
 def get_orders(user_id: int, db: Session = Depends(get_db)):
@@ -19,7 +33,10 @@ def get_orders(user_id: int, db: Session = Depends(get_db)):
 
 @app.post("/orders", response_model=schemas.Order)
 def create_order(order: schemas.Order, db: Session = Depends(get_db)):
-    response = requests.get(f"{PRODUCTS_URL}/{order.product_id}")
+    service_token = get_service_token()
+    headers = {"Authorization": f"Bearer {service_token}"}
+    
+    response = requests.get(f"{PRODUCTS_URL}/{order.product_id}", headers=headers)
     if response.status_code != 200:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -27,7 +44,7 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
     if product["quantity"] < order.quantity:
         raise HTTPException(status_code=400, detail="Not enough stock")
     
-    requests.put(f"{PRODUCTS_URL}/{order.product_id}/reduce", params={"quantity": order.quantity})
+    requests.put(f"{PRODUCTS_URL}/{order.product_id}/reduce", params={"quantity": order.quantity}, headers=headers)
 
     new_order = models.OrderModel(
         user_id=order.user_id,
