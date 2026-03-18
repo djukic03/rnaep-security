@@ -14,8 +14,8 @@ NOTIFICATIONS_URL = "http://notifications-service:8000/notifications"
 models.Base.metadata.create_all(bind=engine)
 
 @app.get("/orders", response_model=List[schemas.Order])
-def get_orders(db: Session = Depends(get_db)):
-    return db.query(models.OrderModel).all()
+def get_orders(user_id: int, db: Session = Depends(get_db)):
+    return db.query(models.OrderModel).filter(models.OrderModel.user_id == user_id).all()
 
 @app.post("/orders", response_model=schemas.Order)
 def create_order(order: schemas.Order, db: Session = Depends(get_db)):
@@ -30,6 +30,7 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
     requests.put(f"{PRODUCTS_URL}/{order.product_id}/reduce", params={"quantity": order.quantity})
 
     new_order = models.OrderModel(
+        user_id=order.user_id,
         product_id=order.product_id, 
         quantity=order.quantity, 
         note=order.note
@@ -40,9 +41,10 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
     db.refresh(new_order)
 
     requests.post(NOTIFICATIONS_URL, json={
-        "order_id": order.id,
-        "product_id": order.product_id,
-        "message": f"Order {order.id} for product {order.product_id} has been placed."
+        "order_id": new_order.id,
+        "user_id": new_order.user_id,
+        "product_id": new_order.product_id,
+        "message": f"Order {new_order.id} for product {new_order.product_id} has been placed by user {new_order.user_id}."
     })
 
     return new_order
