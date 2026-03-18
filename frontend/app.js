@@ -124,7 +124,7 @@ async function loadUsers() {
 }
 
 function updateNavAuth() {
-  const loggedIn = !!sessionStorage.getItem("access_token");
+  const loggedIn = !!sessionStorage.getItem("role");
   const navOut = document.getElementById("nav-out");
   const navIn = document.getElementById("nav-in");
   if (!navOut || !navIn) return;
@@ -137,8 +137,8 @@ const ordersLocked = document.getElementById("orders-locked");
 const ordersUnlocked = document.getElementById("orders-unlocked");
 
 if (ordersLocked && ordersUnlocked) {
-  const token = sessionStorage.getItem("access_token");
-  if (!token) {
+  const role = sessionStorage.getItem("role");
+  if (!role) {
     ordersLocked.style.display = "block";
     ordersUnlocked.style.display = "none";
   } else {
@@ -153,10 +153,9 @@ const usersLocked    = document.getElementById('users-locked');
 const usersUnlocked  = document.getElementById('users-unlocked');
 
 if (usersForbidden && usersLocked && usersUnlocked) {
-  const token  = sessionStorage.getItem('access_token');
   const role   = sessionStorage.getItem('role');
 
-  if (!token) {
+  if (!role) {
     usersLocked.style.display    = 'block';
     usersForbidden.style.display = 'none';
     usersUnlocked.style.display  = 'none';
@@ -176,7 +175,7 @@ const orderAuthWarning = document.getElementById("order-auth-warning");
 const orderFormFields = document.getElementById("order-form-fields");
 
 if (orderAuthWarning && orderFormFields) {
-  const loggedIn = !!sessionStorage.getItem("access_token");
+  const loggedIn = !!sessionStorage.getItem("role");
   orderAuthWarning.style.display = loggedIn ? "none" : "block";
   orderFormFields.style.display = loggedIn ? "block" : "none";
 }
