@@ -1,8 +1,6 @@
 from database import SessionLocal, engine
 import models
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 def seed_users():
     models.Base.metadata.create_all(bind=engine)
     db = SessionLocal()
