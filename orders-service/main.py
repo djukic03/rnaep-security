@@ -59,7 +59,7 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
 
     requests.post(NOTIFICATIONS_URL, json={
         "order_id": new_order.id,
-        "username": new_order.user_id,
+        "user_id": new_order.user_id,
         "product_id": new_order.product_id,
         "message": f"Order {new_order.id} for product {new_order.product_id} has been placed by user {new_order.user_id}."
     })
