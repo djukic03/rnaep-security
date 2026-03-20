@@ -13,5 +13,5 @@ def get_notifications():
 @app.post("/notifications", response_model=Notification)
 def create_notification(notification: Notification):
     notifications_db.append(notification)
-    print(f"Notification sent: Order {notification.order_id} for product {notification.product_id} has been placed.")
+    print(f"Notification sent: Order {notification.order_id} for product {notification.product_id} has been placed by user {notification.user_id}.")
     return notification
