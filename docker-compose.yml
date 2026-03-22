@@ -10,6 +10,8 @@ services:
   auth-service:
     build: ./auth-service
     container_name: auth-service
+    env_file: 
+      - ./auth-service/.env
     ports:
       - "8001:8000"
     volumes:
@@ -20,6 +22,8 @@ services:
     build:
       context: ./products-service
     container_name: products-service
+    env_file:
+      - ./products-service/.env
     ports:
       - "8002:8000"
     volumes:
@@ -30,6 +34,8 @@ services:
     build:
       context: ./orders-service
     container_name: orders-service
+    env_file:
+      - ./orders-service/.env
     ports:
       - "8003:8000"
     volumes:
@@ -49,6 +55,8 @@ services:
     build:
       context: ./gateway
     container_name: api-gateway
+    env_file:
+      - ./gateway/.env
     ports:
       - "8000:8000"
     depends_on:

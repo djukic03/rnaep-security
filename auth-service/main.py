@@ -1,14 +1,15 @@
 from fastapi import FastAPI, HTTPException, Depends, Request, Form
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 from database import get_db
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 import models, schemas, uuid, jwt
 from datetime import datetime, timedelta
+import os, json
+from pwdlib import PasswordHash
 
-SECRET_KEY = "RNAEP_ELAB"
-ALGORITHM = "HS256"
+password_hash = PasswordHash.recommended()
+
 TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(title="Auth Service")
@@ -20,19 +21,22 @@ auth_codes = {}
 #       ACG flow
 ############################
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
 @app.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    exist = db.execute(text(f"SELECT * FROM users WHERE username = '{user.username}'")).fetchone()
+    exist = db.query(models.User).filter(models.User.username == user.username).first()
     if exist:
         raise HTTPException(status_code=400, detail="Korisničko ime već postoji")
     
     new_user = models.User(
         username=user.username,
-        password=user.password,
+        password=password_hash.hash(user.password),
         role="user"
     )
     db.add(new_user)
@@ -60,9 +64,9 @@ def authorize(
     redirect_uri: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    user = db.execute(text(f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'")).fetchone()
+    user = db.query(models.User).filter(models.User.username == username).first()
     
-    if not user:
+    if not user or not password_hash.verify(password, user.password):
         return templates.TemplateResponse("login.html", {
             "request": request,
             "response_type": response_type,
@@ -83,7 +87,7 @@ def token(code: schemas.TokenRequest, db: Session = Depends(get_db)):
     if not code:
         raise HTTPException(status_code=400, detail="Nevažeći authorization code")
     
-    user = db.execute(text(f"SELECT * FROM users WHERE username = '{code['username']}'")).fetchone()
+    user = db.query(models.User).filter(models.User.username == code['username']).first()
     
     payload = {
         "sub": user.username,
@@ -105,9 +109,7 @@ def token(code: schemas.TokenRequest, db: Session = Depends(get_db)):
 #      CCG flow
 ###############################
 
-SERVICE_CLIENTS = {
-    "orders-service": "orders-secret"
-}
+SERVICE_CLIENTS = json.loads(os.getenv("SERVICE_CLIENTS"))
 
 @app.post("/token/service")
 def service_token(credentials: schemas.ServiceTokenRequest):

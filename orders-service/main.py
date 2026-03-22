@@ -1,18 +1,18 @@
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 from database import get_db, engine
 from typing import List
 import requests
 import models, schemas
+import os
 
 app = FastAPI(title="Orders Service")
 
 PRODUCTS_URL = "http://products-service:8000/products"
 NOTIFICATIONS_URL = "http://notifications-service:8000/notifications"
 AUTH_URL = "http://auth-service:8000"
-CLIENT_ID = "orders-service"
-CLIENT_SECRET = "orders-secret"
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 models.Base.metadata.create_all(bind=engine)
 

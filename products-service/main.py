@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
 import models, schemas, jwt
+import os
 
 app = FastAPI(title="Products Service")
 
-SECRET_KEY = "RNAEP_ELAB"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 def verify_service_token(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):

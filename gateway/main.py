@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Header, Depends, HTTPException, Cookie, Re
 from fastapi.middleware.cors import CORSMiddleware
 import requests
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
-import jwt
+import jwt, os
 
 app = FastAPI(title="API Gateway")
 
@@ -14,8 +14,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SECRET_KEY = "RNAEP_ELAB"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 AUTH_URL = "http://auth-service:8000"
 PRODUCTS_URL = "http://products-service:8000/products"

@@ -4,3 +4,4 @@ pydantic
 sqlalchemy
 jinja2
 pyjwt
+pwdlib[argon2]

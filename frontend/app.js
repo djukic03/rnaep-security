@@ -1,5 +1,11 @@
 const GATEWAY_URL = "http://localhost:8000";
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
 async function loadProducts() {
   const list = document.getElementById("product-list");
   if (!list) return;
@@ -24,34 +30,29 @@ function renderProducts(products) {
     return;
   }
 
-  list.innerHTML = products
-    .map((p) => {
-      const stockBadge = `<span class="badge badge-green">Na stanju: ${p.quantity}</span>`;
+  list.innerHTML = products.map((p) => {
+      const stockBadge = `<span class="badge badge-green">Na stanju: ${escapeHtml(p.quantity)}</span>`;
 
       return `
       <div class="product-row">
         <div>
-          <div class="product-name">${p.name}</div>
-          <div class="product-info">product_id: ${p.id} &nbsp;·&nbsp; ${stockBadge}</div>
+          <div class="product-name">${escapeHtml(p.name)}</div>
+          <div class="product-info">product_id: ${escapeHtml(p.id)} &nbsp;·&nbsp; ${stockBadge}</div>
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
-          <span class="product-price">$${p.price.toLocaleString()}</span>
+          <span class="product-price">$${escapeHtml(p.price.toLocaleString())}</span>
         </div>
       </div>
     `;
-    })
-    .join("");
+    }).join("");
 }
 
 function populateOrderSelect(products) {
   const select = document.getElementById("order-product");
   if (!select) return;
-  select.innerHTML = products
-    .map(
-      (p) =>
-        `<option value="${p.id}">${p.name} — $${p.price.toLocaleString()}</option>`,
-    )
-    .join("");
+  select.innerHTML = products.map((p) =>
+        `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} — $${escapeHtml(p.price.toLocaleString())}</option>`,
+    ).join("");
 }
 
 document.getElementById("btn-order")?.addEventListener("click", async () => {
@@ -103,17 +104,13 @@ function renderOrders(orders) {
     return;
   }
 
-  tbody.innerHTML = orders
-    .map(
-      (o) => `
+  tbody.innerHTML = orders.map((o) => `
     <tr>
-      <td>${o.product_id}</td>
-      <td>${o.quantity}</td>
-      <td>${o.note || "—"}</td>
+      <td>${escapeHtml(o.product_id)}</td>
+      <td>${escapeHtml(o.quantity)}</td>
+      <td>${escapeHtml(o.note || '—')}</td>
     </tr>
-  `,
-    )
-    .join("");
+  `).join("");
 }
 
 
@@ -128,9 +125,9 @@ async function loadUsers() {
     const users = await res.json();
     tbody.innerHTML = users.map(u => `
       <tr>
-        <td>${u.id}</td>
-        <td>${u.username}</td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-red' : 'badge-blue'}">${u.role}</span></td>
+        <td>${escapeHtml(u.id)}</td>
+        <td>${escapeHtml(u.username)}</td>
+        <td><span class="badge ${u.role === 'admin' ? 'badge-red' : 'badge-blue'}">${escapeHtml(u.role)}</span></td>
       </tr>
     `).join('');
   } catch (err) {
