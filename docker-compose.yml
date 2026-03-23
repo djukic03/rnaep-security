@@ -16,6 +16,7 @@ services:
       - "8001:8000"
     volumes:
       - ./auth-service/data:/app/data
+      - ./shared:/app/shared
     command: sh -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   products-service:
@@ -28,6 +29,7 @@ services:
       - "8002:8000"
     volumes:
       - ./products-service/data:/app/data
+      - ./shared:/app/shared
     command: sh -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000"
 
   orders-service:
@@ -40,6 +42,7 @@ services:
       - "8003:8000"
     volumes:
       - ./orders-service/data:/app/data
+      - ./shared:/app/shared
     depends_on:
       - products-service
       - notifications-service
@@ -50,6 +53,8 @@ services:
     container_name: notifications-service
     ports:
       - "8004:8000"
+    volumes:
+      - ./shared:/app/shared
 
   gateway:
     build:
@@ -59,7 +64,45 @@ services:
       - ./gateway/.env
     ports:
       - "8000:8000"
+    volumes:
+      - ./shared:/app/shared
     depends_on:
       - products-service
       - orders-service
       - notifications-service
+
+  mongodb:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: user
+    volumes:
+      - mongo_data:/data/db
+
+  elasticsearch:
+    image: elasticsearch:7.17.9
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  graylog:
+    image: graylog/graylog:5.2
+    environment:
+      GRAYLOG_PASSWORD_SECRET: "graylogPassword123"
+      GRAYLOG_ROOT_PASSWORD_SHA2: "27b56ad08dff7f8c43b937b59fc6d8d0ce9b7cd72a3bbd18f9fc9c049f3a05bc"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://localhost:9000/"
+      GRAYLOG_MONGODB_URI: "mongodb://user:user@mongodb:27017/graylog?authSource=admin"
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+    ports:
+      - "9000:9000"
+      - "12201:12201/udp"
+    depends_on: 
+      - mongodb
+      - elasticsearch
+
+volumes:
+  mongo_data:
+  es_data:
