@@ -77,13 +77,16 @@ def authorize_form(request: Request, client_id: str, redirect_uri: str):
         "redirect_uri": redirect_uri,
         "service": "auth-service",
     })
-    return templates.TemplateResponse("login.html", {
-        "request": request,
-        "response_type": "code",
-        "client_id": client_id,
-        "redirect_uri": redirect_uri,
-        "error": None
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={
+            "response_type": "code",
+            "client_id": client_id,
+            "redirect_uri": redirect_uri,
+            "error": None
+        }
+    )
     
 @app.post("/authorize")
 def authorize(
@@ -103,13 +106,16 @@ def authorize(
             "client_id": client_id,
             "service": "auth-service",
         })
-        return templates.TemplateResponse("login.html", {
-            "request": request,
-            "response_type": response_type,
-            "client_id": client_id,
-            "redirect_uri": redirect_uri,
-            "error": "Pogrešno korisničko ime ili lozinka"
-        })
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html",
+            context={
+                "response_type": "code",
+                "client_id": client_id,
+                "redirect_uri": redirect_uri,
+                "error": "Neispravni kredencijali"
+            }
+        )
 
     code = str(uuid.uuid4())
     auth_codes[code] = {"username": username, "role": user.role}
