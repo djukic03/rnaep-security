@@ -49,7 +49,7 @@ def get_users(db: Session = Depends(get_db)):
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     exist = db.query(models.User).filter(models.User.username == user.username).first()
     if exist:
-        logger.warning("register_failed_duplicate", extra={
+        logger.error("register_failed_duplicate", extra={
             "username": user.username,
             "service": "auth-service",
         })
@@ -101,7 +101,7 @@ def authorize(
     user = db.query(models.User).filter(models.User.username == username).first()
 
     if not user or not password_hash.verify(password, user.password):
-        logger.warning("login_failed", extra={
+        logger.error("login_failed", extra={
             "username": username,
             "client_id": client_id,
             "service": "auth-service",
@@ -132,7 +132,7 @@ def token(code: schemas.TokenRequest, db: Session = Depends(get_db)):
     data = auth_codes.pop(code.auth_code, None)
 
     if not data:
-        logger.warning("token_invalid_code", extra={
+        logger.error("token_invalid_code", extra={
             "auth_code": code.auth_code,
             "service": "auth-service",
         })
@@ -172,7 +172,7 @@ def service_token(credentials: schemas.ServiceTokenRequest):
     client_secret = SERVICE_CLIENTS.get(credentials.client_id)
 
     if not client_secret or client_secret != credentials.client_secret:
-        logger.warning("service_token_failed", extra={
+        logger.error("service_token_failed", extra={
             "client_id": credentials.client_id,
             "service": "auth-service",
         })

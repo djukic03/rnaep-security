@@ -30,7 +30,7 @@ async def log_requests(request: Request, call_next):
 
 def verify_service_token(authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
-        logger.warning("token_missing", extra={
+        logger.error("token_missing", extra={
             "service": "products-service",
         })
         raise HTTPException(status_code=401, detail="Token nije prosleđen")
@@ -40,19 +40,19 @@ def verify_service_token(authorization: str = Header(None)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("sub") != "orders-service":
-            logger.warning("unauthorized_caller", extra={
+            logger.error("unauthorized_caller", extra={
                 "caller": payload.get("sub"),
                 "service": "products-service",
             })
             raise HTTPException(status_code=403, detail="Neovlašćen pristup")
         return payload
     except jwt.ExpiredSignatureError:
-        logger.warning("token_expired", extra={
+        logger.error("token_expired", extra={
             "service": "products-service",
         })
         raise HTTPException(status_code=401, detail="Token je istekao")
     except jwt.InvalidTokenError:
-        logger.warning("token_invalid", extra={
+        logger.error("token_invalid", extra={
             "service": "products-service",
         })
         raise HTTPException(status_code=401, detail="Neispravan token")
@@ -71,7 +71,7 @@ def get_products(db: Session = Depends(get_db)):
 def get_product(product_id: int, db: Session = Depends(get_db), payload: dict = Depends(verify_service_token)):
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
-        logger.warning("product_not_found", extra={
+        logger.error("product_not_found", extra={
             "product_id": product_id,
             "service": "products-service",
         })
@@ -87,14 +87,14 @@ def get_product(product_id: int, db: Session = Depends(get_db), payload: dict = 
 def reduce_quantity(product_id: int, quantity: int, db: Session = Depends(get_db), payload: dict = Depends(verify_service_token)):
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
-        logger.warning("product_not_found", extra={
+        logger.error("product_not_found", extra={
             "product_id": product_id,
             "service": "products-service",
         })
         raise HTTPException(status_code=404, detail="Product not found")
 
     if product.quantity < quantity:
-        logger.warning("insufficient_stock", extra={
+        logger.error("insufficient_stock", extra={
             "product_id": product_id,
             "requested": quantity,
             "available": product.quantity,

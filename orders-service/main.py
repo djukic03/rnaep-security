@@ -43,7 +43,7 @@ def get_service_token():
     if response.status_code == 200:
         return response.json().get("access_token")
 
-    logger.warning("service_token_failed", extra={
+    logger.error("service_token_failed", extra={
         "status_code": response.status_code,
         "service": "orders-service",
     })
@@ -68,7 +68,7 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
 
     response = requests.get(f"{PRODUCTS_URL}/{order.product_id}", headers=headers)
     if response.status_code != 200:
-        logger.warning("product_not_found", extra={
+        logger.error("product_not_found", extra={
             "product_id": order.product_id,
             "service": "orders-service",
         })
@@ -76,7 +76,7 @@ def create_order(order: schemas.Order, db: Session = Depends(get_db)):
 
     product = response.json()
     if product["quantity"] < order.quantity:
-        logger.warning("insufficient_stock", extra={
+        logger.error("insufficient_stock", extra={
             "product_id": order.product_id,
             "requested": order.quantity,
             "available": product["quantity"],

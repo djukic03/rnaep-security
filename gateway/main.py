@@ -41,7 +41,7 @@ async def log_requests(request: Request, call_next):
 
 def verify_token(access_token: str = Cookie(None)):
     if not access_token:
-        logger.warning("token_missing", extra={
+        logger.error("token_missing", extra={
             "service": "api-gateway",
         })
         raise HTTPException(status_code=401, detail="Token nije prosleđen")
@@ -50,19 +50,19 @@ def verify_token(access_token: str = Cookie(None)):
         payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
-        logger.warning("token_expired", extra={
+        logger.error("token_expired", extra={
             "service": "api-gateway",
         })
         raise HTTPException(status_code=401, detail="Token je istekao")
     except jwt.InvalidTokenError:
-        logger.warning("token_invalid", extra={
+        logger.error("token_invalid", extra={
             "service": "api-gateway",
         })
         raise HTTPException(status_code=401, detail="Neispravan token")
 
 def verify_admin(payload: dict = Depends(verify_token)):
     if payload.get("role") != "admin":
-        logger.warning("access_denied", extra={
+        logger.error("access_denied", extra={
             "user_id": payload.get("id"),
             "username": payload.get("sub"),
             "service": "api-gateway",
@@ -85,7 +85,7 @@ def register(user: dict):
             "service": "api-gateway",
         })
     else:
-        logger.warning("register_failed", extra={
+        logger.error("register_failed", extra={
             "username": user.get("username"),
             "status_code": response.status_code,
             "service": "api-gateway",
@@ -119,7 +119,7 @@ async def authorize(request: Request):
 def token(body: dict, response: Response):
     res = requests.post(AUTH_URL + "/token", json=body)
     if res.status_code != 200:
-        logger.warning("token_exchange_failed", extra={
+        logger.error("token_exchange_failed", extra={
             "status_code": res.status_code,
             "service": "api-gateway",
         })
