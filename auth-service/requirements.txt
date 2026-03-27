@@ -6,3 +6,4 @@ jinja2
 pyjwt
 pwdlib[argon2]
 graypy
+prometheus-fastapi-instrumentator

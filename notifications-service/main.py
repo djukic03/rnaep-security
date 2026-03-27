@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request
 from typing import List
 from schemas import Notification
-from shared.logger import get_logger
+from shared.logger import get_logger, setup_metrics
 import time
 
 app = FastAPI(title="Notifications Service")
 logger = get_logger("notifications-service")
+setup_metrics(app, "notifications-service")
 
 notifications_db: List[Notification] = []
 

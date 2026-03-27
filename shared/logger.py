@@ -1,5 +1,6 @@
 import logging
 import graypy
+from prometheus_fastapi_instrumentator import Instrumentator
 
 def get_logger(service_name: str, graylog_host: str = "graylog"):
     logger = logging.getLogger(service_name)
@@ -12,3 +13,10 @@ def get_logger(service_name: str, graylog_host: str = "graylog"):
     logger.addHandler(console)
 
     return logger
+
+def setup_metrics(app, service_name: str):
+    Instrumentator(
+        should_group_status_codes=True,
+        should_ignore_untemplated=True,
+        excluded_handlers=["/metrics", "/health"],
+    ).instrument(app).expose(app)

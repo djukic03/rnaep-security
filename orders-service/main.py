@@ -5,10 +5,11 @@ from typing import List
 import requests
 import models, schemas
 import os, time
-from shared.logger import get_logger
+from shared.logger import get_logger, setup_metrics
 
 app = FastAPI(title="Orders Service")
 logger = get_logger("orders-service")
+setup_metrics(app, "orders-service")
 
 PRODUCTS_URL = "http://products-service:8000/products"
 NOTIFICATIONS_URL = "http://notifications-service:8000/notifications"

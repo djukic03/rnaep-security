@@ -4,3 +4,4 @@ pydantic
 requests 
 sqlalchemy
 graypy
+prometheus-fastapi-instrumentator

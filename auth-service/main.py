@@ -7,7 +7,7 @@ import models, schemas, uuid, jwt
 from datetime import datetime, timedelta
 import os, json, time
 from pwdlib import PasswordHash
-from shared.logger import get_logger
+from shared.logger import get_logger, setup_metrics
 
 password_hash = PasswordHash.recommended()
 
@@ -18,6 +18,7 @@ templates = Jinja2Templates(directory="templates")
 auth_codes = {}
 
 logger = get_logger("auth-service")
+setup_metrics(app, "auth-service")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

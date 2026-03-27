@@ -4,10 +4,11 @@ from typing import List
 from database import get_db
 import models, schemas, jwt
 import os, time
-from shared.logger import get_logger
+from shared.logger import get_logger, setup_metrics
 
 app = FastAPI(title="Products Service")
 logger = get_logger("products-service")
+setup_metrics(app, "products-service")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

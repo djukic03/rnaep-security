@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 import jwt, os, time
-from shared.logger import get_logger
+from shared.logger import get_logger, setup_metrics
 
 app = FastAPI(title="API Gateway")
 logger = get_logger("api-gateway")
+setup_metrics(app, "api-gateway")
 
 app.add_middleware(
     CORSMiddleware,
